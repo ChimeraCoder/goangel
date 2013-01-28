@@ -2,12 +2,18 @@ package angel
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
+)
+
+const (
+	UserId    = iota
+	StartupId = iota
 )
 
 //For now, assume we already have the access token somehow 
@@ -97,10 +103,21 @@ func QueryUsersSearch(slug string) (*AngelUser, error) {
 }
 
 //Query /startup_roles for all startup roles associated with the user with the given id
-//TODO implement startup_id and "role" 
-func QueryStartupRoles(user_id int64) ([]StartupRole, error) {
+func QueryStartupRoles(id int64, id_type int) ([]StartupRole, error) {
 	resp_ch := make(chan QueryResponse)
-	queryQueue <- QueryChan{"/startup_roles", map[string]string{"user_id": strconv.FormatInt(user_id, 10)}, resp_ch}
+
+	switch id_type {
+	case UserId:
+		{
+			queryQueue <- QueryChan{"/startup_roles", map[string]string{"user_id": strconv.FormatInt(id, 10)}, resp_ch}
+		}
+	case StartupId:
+		{
+			queryQueue <- QueryChan{"/startup_roles", map[string]string{"startup_id": strconv.FormatInt(id, 10)}, resp_ch}
+		}
+	default:
+		return nil, fmt.Errorf("invalid id_type provided")
+	}
 	r := <-resp_ch
 	res := r.result
 	if err := r.err; err != nil {
