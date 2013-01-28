@@ -39,6 +39,7 @@ func init() {
 	go throttledQuery(queryQueue)
 }
 
+//Issue a GET request to the specified endpoint
 func Query(endpoint_path string, keyVals map[string]string) (map[string]interface{}, error) {
 
 	endpoint_url := API_BASE + endpoint_path
@@ -100,6 +101,29 @@ func QueryUsersSearch(slug string) (*AngelUser, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+//Query /users/:id/followers for a user's followers
+//TODO implement proper pagination
+func QueryUsersFollowers(user_id int64) ([]AngelUser, error) {
+	endpoint := fmt.Sprintf("/users/%d/followers", user_id)
+	resp_ch := make(chan QueryResponse)
+	queryQueue <- QueryChan{endpoint, map[string]string{}, resp_ch}
+	r := <-resp_ch
+	res := r.result
+	if err := r.err; err != nil {
+		return nil, err
+	}
+
+	var batch_response UsersBatchResponse
+	resp_bts, err := json.Marshal(res)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(resp_bts, &batch_response); err != nil {
+		return nil, err
+	}
+	return batch_response.Users, nil
 }
 
 //Query /startup_roles for all startup roles associated with the user with the given id
