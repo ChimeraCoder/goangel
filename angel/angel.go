@@ -6,11 +6,11 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
-//For now, assume we already have the access token somehow
-
+//For now, assume we already have the access token somehow 
 const API_BASE = "https://api.angel.co/1"
 
 const SECONDS_PER_QUERY = 10 //By default, execute at most one query every ten seconds
@@ -33,7 +33,7 @@ func init() {
 	go throttledQuery(queryQueue)
 }
 
-func query(endpoint_path string, keyVals map[string]string) (map[string]interface{}, error) {
+func Query(endpoint_path string, keyVals map[string]string) (map[string]interface{}, error) {
 
 	endpoint_url := API_BASE + endpoint_path
 
@@ -64,7 +64,7 @@ func throttledQuery(queryQueue chan QueryChan) {
 		endpoint_path := q.endpoint_path
 		keyVals := q.keyVals
 		response_ch := q.response_ch
-		result, err := query(endpoint_path, keyVals)
+		result, err := Query(endpoint_path, keyVals)
 		response_ch <- struct {
 			result map[string]interface{}
 			err    error
@@ -96,7 +96,6 @@ func QueryUsersSearch(slug string) (*AngelUser, error) {
 	return &user, nil
 }
 
-/*
 //Query /startup_roles for all startup roles associated with the user with the given id
 func queryStartupRolesAngelList(user_id int64) ([]StartupRole, error) {
 	resp_ch := make(chan QueryResponse)
@@ -119,4 +118,4 @@ func queryStartupRolesAngelList(user_id int64) ([]StartupRole, error) {
 		return nil, err
 	}
 	return roles, err
-}*/
+}
