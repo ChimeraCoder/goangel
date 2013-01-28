@@ -15,13 +15,13 @@ type AngelUser struct {
 
 	//StartupRoles []StartupRole
 
-	Linkedin_url   string
-	Bio            string
-	Twitter_url    string
+	Linkedin_url   *string
+	Bio            *string
+	Twitter_url    *string
 	Follower_count float64
-	Image          string
-	Facebook_url   string
+	Image          *string
+	Facebook_url   *string
 	Locations      []interface{}
-	Blog_url       string
-	Online_bio_url string
+	Blog_url       *string
+	Online_bio_url *string
 }
