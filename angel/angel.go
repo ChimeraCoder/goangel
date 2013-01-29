@@ -50,6 +50,7 @@ func Query(endpoint_path string, keyVals map[string]string) (map[string]interfac
 		v.Set(key, val)
 	}
 
+	log.Printf("Querying %s", endpoint_url+"?"+v.Encode())
 	resp, err := http.Get(endpoint_url + "?" + v.Encode())
 	if err != nil {
 		return nil, err
@@ -124,6 +125,58 @@ func QueryUsersFollowers(user_id int64) ([]AngelUser, error) {
 		return nil, err
 	}
 	return batch_response.Users, nil
+}
+
+//Query /users/:id/following for a user's followers (return users only)
+//TODO implement proper pagination
+func QueryUsersFollowingUsers(user_id int64) ([]AngelUser, error) {
+
+	endpoint := fmt.Sprintf("/users/%d/following", user_id)
+	resp_ch := make(chan QueryResponse)
+
+	queryQueue <- QueryChan{endpoint, map[string]string{"type": "user"}, resp_ch}
+
+	r := <-resp_ch
+	res := r.result
+	if err := r.err; err != nil {
+		return nil, err
+	}
+
+	var batch_response UsersBatchResponse
+	resp_bts, err := json.Marshal(res)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(resp_bts, &batch_response); err != nil {
+		return nil, err
+	}
+	return batch_response.Users, nil
+}
+
+//Query /users/:id/following for a user's followers (return startups only)
+//TODO implement proper pagination
+func QueryUsersFollowingStartups(user_id int64) ([]Startup, error) {
+
+	endpoint := fmt.Sprintf("/users/%d/following", user_id)
+	resp_ch := make(chan QueryResponse)
+
+	queryQueue <- QueryChan{endpoint, map[string]string{"type": "startup"}, resp_ch}
+
+	r := <-resp_ch
+	res := r.result
+	if err := r.err; err != nil {
+		return nil, err
+	}
+
+	var batch_response StartupsBatchResponse
+	resp_bts, err := json.Marshal(res)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(resp_bts, &batch_response); err != nil {
+		return nil, err
+	}
+	return batch_response.Startups, nil
 }
 
 //Query /startup_roles for all startup roles associated with the user with the given id
