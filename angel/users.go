@@ -1,7 +1,7 @@
 package angel
-
 import (
     "log"
+    "fmt"
     "encoding/json"
 )
 
@@ -27,4 +27,23 @@ func QueryUsersSearch(slug string) (*AngelUser, error) {
 	return &user, nil
 }
 
+//Query /users/:id/startups for a user's startup roles
+func QueryUsersStartups(id int64) ([]StartupRole, error){
+    endpoint := fmt.Sprintf("/users/%d/startups", id)
+	resp_ch := make(chan QueryResponse)
+	queryQueue <- QueryChan{endpoint, map[string]string{}, resp_ch}
+	r := <-resp_ch
+	res := r.result
+	if err := r.err; err != nil {
+		return nil, err
+	}
 
+	var roles []StartupRole
+	roles_bts, err := json.Marshal(res["startup_roles"])
+	if err != nil {
+	}
+	if err := json.Unmarshal(roles_bts, &roles); err != nil {
+		return nil, err
+	}
+	return roles, nil
+}
