@@ -5,7 +5,6 @@ package angel
 
 import (
     "fmt"
-    "encoding/json"
 )
 
 
@@ -38,26 +37,11 @@ func QueryUsersFollowingUsers(user_id int64) (users []AngelUser, err error) {
 
 //Query /users/:id/following for a user's followers (return startups only)
 //TODO implement proper pagination
-func QueryUsersFollowingStartups(user_id int64) ([]Startup, error) {
-
-	endpoint := fmt.Sprintf("/users/%d/following", user_id)
-	resp_ch := make(chan QueryResponse)
-
-	queryQueue <- QueryChan{endpoint, map[string]string{"type": "startup"}, resp_ch}
-
-	r := <-resp_ch
-	res := r.result
-	if err := r.err; err != nil {
-		return nil, err
-	}
+func QueryUsersFollowingStartups(user_id int64) (startups []Startup, err error) {
 
 	var batch_response StartupsBatchResponse
-	resp_bts, err := json.Marshal(res)
-	if err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(resp_bts, &batch_response); err != nil {
-		return nil, err
-	}
-	return batch_response.Startups, nil
+	endpoint := fmt.Sprintf("/users/%d/following", user_id)
+    err = execQueryThrottled(endpoint, map[string]string{"type" : "startup"}, &batch_response)
+    startups = batch_response.Startups
+    return 
 }
