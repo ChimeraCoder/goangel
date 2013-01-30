@@ -1,5 +1,7 @@
 package angel
+
 import (
+    "fmt"
     "encoding/json"
 )
 
@@ -7,7 +9,6 @@ import (
 //Query /users/:id for a user's information given an id
 
 
-/**
 //Query /users/:id/startups for a user's startup roles
 func QueryUsersStartups(id int64) ([]StartupRole, error){
     endpoint := fmt.Sprintf("/users/%d/startups", id)
@@ -19,16 +20,15 @@ func QueryUsersStartups(id int64) ([]StartupRole, error){
 		return nil, err
 	}
 
-	var roles []StartupRole
-	roles_bts, err := json.Marshal(res["startup_roles"])
-	if err != nil {
-	}
-	if err := json.Unmarshal(roles_bts, &roles); err != nil {
+    var tmp struct{
+        Startup_roles []StartupRole
+    }
+
+	if err := json.Unmarshal(res, &tmp); err != nil {
 		return nil, err
 	}
-	return roles, nil
+	return tmp.Startup_roles, nil
 }
-**/
 
 //Query /users/batch for up to 50 users at a time, givne a comma-separated list of IDs
 
