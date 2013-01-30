@@ -1,7 +1,6 @@
 package angel
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -29,7 +28,7 @@ type QueryChan struct {
 }
 
 type QueryResponse struct {
-	result map[string]interface{}
+	result []byte
 	err    error
 }
 
@@ -38,7 +37,7 @@ func init() {
 }
 
 //Issue a GET request to the specified endpoint
-func Query(endpoint_path string, keyVals map[string]string) (map[string]interface{}, error) {
+func Query(endpoint_path string, keyVals map[string]string) ([]byte, error) {
 
 	endpoint_url := API_BASE + endpoint_path
 
@@ -58,9 +57,7 @@ func Query(endpoint_path string, keyVals map[string]string) (map[string]interfac
 	if err != nil {
 		panic(err)
 	}
-	result := make(map[string]interface{})
-	err = json.Unmarshal(body, &result)
-	return result, err
+	return body, err
 }
 
 //Execute a query that will automatically be throttled
@@ -72,7 +69,7 @@ func throttledQuery(queryQueue chan QueryChan) {
 		response_ch := q.response_ch
 		result, err := Query(endpoint_path, keyVals)
 		response_ch <- struct {
-			result map[string]interface{}
+			result []byte
 			err    error
 		}{result, err}
 
