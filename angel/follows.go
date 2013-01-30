@@ -11,70 +11,29 @@ import (
 
 //Query /users/:id/followers for a user's followers
 //TODO implement proper pagination
-func QueryUsersFollowers(user_id int64) ([]AngelUser, error) {
-	return queryFollowersAux(user_id, UserId)
+func QueryUsersFollowers(user_id int64) (users []AngelUser, err error) {
+    err = execQueryThrottled(fmt.Sprintf("/startups/%d/followers", user_id), map[string]string{}, users)
+    return 
 }
 
-//Query /startups/:id/followers for a user's followers
+//Query /startups/:id/followers for a startup's followers
 //TODO implement proper pagination
-func QueryStartupsFollowers(user_id int64) ([]AngelUser, error) {
-	return queryFollowersAux(user_id, StartupId)
+func QueryStartupsFollowers(user_id int64) (users []AngelUser, err error) {
+
+    err = execQueryThrottled(fmt.Sprintf("/users/%d/followers", user_id), map[string]string{}, users)
+    return 
 }
 
-//Auxiliary function used for /users/:id/followers and /startups/:id/followers
-func queryFollowersAux(angel_id int64, entity int) ([]AngelUser, error) {
-	var endpoint string
-	switch entity {
-	case UserId:
-		endpoint = fmt.Sprintf("/users/%d/followers", angel_id)
-	case StartupId:
-		endpoint = fmt.Sprintf("/startups/%d/followers", angel_id)
-	default:
-		return nil, fmt.Errorf("invalid entity provided")
-	}
-	resp_ch := make(chan QueryResponse)
-	queryQueue <- QueryChan{endpoint, map[string]string{}, resp_ch}
-	r := <-resp_ch
-	res := r.result
-	if err := r.err; err != nil {
-		return nil, err
-	}
-
-	var batch_response UsersBatchResponse
-	resp_bts, err := json.Marshal(res)
-	if err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(resp_bts, &batch_response); err != nil {
-		return nil, err
-	}
-	return batch_response.Users, nil
-}
 
 //Query /users/:id/following for a user's followers (return users only)
 //TODO implement proper pagination
-func QueryUsersFollowingUsers(user_id int64) ([]AngelUser, error) {
-
-	endpoint := fmt.Sprintf("/users/%d/following", user_id)
-	resp_ch := make(chan QueryResponse)
-
-	queryQueue <- QueryChan{endpoint, map[string]string{"type": "user"}, resp_ch}
-
-	r := <-resp_ch
-	res := r.result
-	if err := r.err; err != nil {
-		return nil, err
-	}
+func QueryUsersFollowingUsers(user_id int64) (users []AngelUser, err error) {
 
 	var batch_response UsersBatchResponse
-	resp_bts, err := json.Marshal(res)
-	if err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(resp_bts, &batch_response); err != nil {
-		return nil, err
-	}
-	return batch_response.Users, nil
+	endpoint := fmt.Sprintf("/users/%d/following", user_id)
+    err = execQueryThrottled(endpoint, map[string]string{}, &batch_response)
+    users = batch_response.Users
+    return
 }
 
 //Query /users/:id/following for a user's followers (return startups only)
