@@ -1,8 +1,8 @@
 package angel
 
 import (
+	"encoding/json"
 	"io/ioutil"
-    "encoding/json"
 	"log"
 	"net/http"
 	"net/url"
@@ -84,10 +84,10 @@ func execQueryThrottled(endpoint string, vals map[string]string, result interfac
 	r := <-resp_ch
 	res := r.result
 	if err := r.err; err != nil {
-        return err
+		return err
 	}
 
-    //Result should be a pointer to the desired struct
+	//Result should be a pointer to the desired struct
 	if err := json.Unmarshal(res, result); err != nil {
 		return err
 	}

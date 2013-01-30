@@ -13,15 +13,15 @@ func QueryStartupRoles(id int64, id_type int) (startuproles []StartupRole, err e
 	switch id_type {
 	case UserId:
 		{
-            err = execQueryThrottled("/startup_roles", map[string]string{"user_id": strconv.FormatInt(id, 10)}, &tmp)
+			err = execQueryThrottled("/startup_roles", map[string]string{"user_id": strconv.FormatInt(id, 10)}, &tmp)
 		}
 	case StartupId:
 		{
-            err = execQueryThrottled("/startup_roles", map[string]string{"startup_id": strconv.FormatInt(id, 10)}, &tmp)
+			err = execQueryThrottled("/startup_roles", map[string]string{"startup_id": strconv.FormatInt(id, 10)}, &tmp)
 		}
 	default:
 		return nil, fmt.Errorf("invalid id_type provided")
 	}
 	startuproles = tmp.Startup_roles
-	return 
+	return
 }
