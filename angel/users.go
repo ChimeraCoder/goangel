@@ -11,22 +11,14 @@ import (
 
 //Query /users/:id/startups for a user's startup roles
 func QueryUsersStartups(id int64) ([]StartupRole, error){
-    endpoint := fmt.Sprintf("/users/%d/startups", id)
-	resp_ch := make(chan QueryResponse)
-	queryQueue <- QueryChan{endpoint, map[string]string{}, resp_ch}
-	r := <-resp_ch
-	res := r.result
-	if err := r.err; err != nil {
-		return nil, err
-	}
-
     var tmp struct{
         Startup_roles []StartupRole
     }
+    endpoint := fmt.Sprintf("/users/%d/startups", id)
+    if err := execQueryThrottled(endpoint, map[string]string{}, &tmp); err != nil{
+        return nil, err
+    }
 
-	if err := json.Unmarshal(res, &tmp); err != nil {
-		return nil, err
-	}
 	return tmp.Startup_roles, nil
 }
 

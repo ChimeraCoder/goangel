@@ -2,6 +2,7 @@ package angel
 
 import (
 	"io/ioutil"
+    "encoding/json"
 	"log"
 	"net/http"
 	"net/url"
@@ -75,4 +76,20 @@ func throttledQuery(queryQueue chan QueryChan) {
 
 		time.Sleep(SECONDS_PER_QUERY)
 	}
+}
+
+func execQueryThrottled(endpoint string, vals map[string]string, result interface{}) error {
+	resp_ch := make(chan QueryResponse)
+	queryQueue <- QueryChan{endpoint, vals, resp_ch}
+	r := <-resp_ch
+	res := r.result
+	if err := r.err; err != nil {
+        return err
+	}
+
+    //Result should be a pointer to the desired struct
+	if err := json.Unmarshal(res, result); err != nil {
+		return err
+	}
+	return nil
 }
