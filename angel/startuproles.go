@@ -1,41 +1,27 @@
 package angel
 
 import (
-    "fmt"
-    "strconv"
-    "encoding/json"
+	"fmt"
+	"strconv"
 )
 
 //Query /startup_roles for all startup roles associated with the user with the given id
-func QueryStartupRoles(id int64, id_type int) ([]StartupRole, error) {
-    var err error
-	resp_ch := make(chan QueryResponse)
-
+func QueryStartupRoles(id int64, id_type int) (startuproles []StartupRole, err error) {
+	var tmp struct {
+		Startup_roles []StartupRole
+	}
 	switch id_type {
 	case UserId:
 		{
-			queryQueue <- QueryChan{"/startup_roles", map[string]string{"user_id": strconv.FormatInt(id, 10)}, resp_ch}
+            err = execQueryThrottled("/startup_roles", map[string]string{"user_id": strconv.FormatInt(id, 10)}, &tmp)
 		}
 	case StartupId:
 		{
-			queryQueue <- QueryChan{"/startup_roles", map[string]string{"startup_id": strconv.FormatInt(id, 10)}, resp_ch}
+            err = execQueryThrottled("/startup_roles", map[string]string{"startup_id": strconv.FormatInt(id, 10)}, &tmp)
 		}
 	default:
 		return nil, fmt.Errorf("invalid id_type provided")
 	}
-	r := <-resp_ch
-	res := r.result
-	if err := r.err; err != nil {
-		return nil, err
-	}
-
-    var tmp struct{
-        Startup_roles []StartupRole
-    }
-
-	if err := json.Unmarshal(res, &tmp); err != nil {
-		return nil, err
-	}
-	return tmp.Startup_roles, err
+	startuproles = tmp.Startup_roles
+	return 
 }
-
