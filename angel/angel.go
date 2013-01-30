@@ -2,12 +2,10 @@ package angel
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 )
 
@@ -80,62 +78,4 @@ func throttledQuery(queryQueue chan QueryChan) {
 
 		time.Sleep(SECONDS_PER_QUERY)
 	}
-}
-
-//Query /users/search for a user with the specified slug
-//TODO fix this to search for emails as well
-func QueryUsersSearch(slug string) (*AngelUser, error) {
-	resp_ch := make(chan QueryResponse)
-	queryQueue <- QueryChan{"/users/search", map[string]string{"slug": slug}, resp_ch}
-	r := <-resp_ch
-	res := r.result
-	if err := r.err; err != nil {
-		return nil, err
-	}
-
-	var user AngelUser
-	users_bts, err := json.Marshal(res)
-	if err != nil {
-	}
-	if err := json.Unmarshal(users_bts, &user); err != nil {
-		log.Print(string(users_bts))
-		return nil, err
-	}
-	return &user, nil
-}
-
-//Query /startup_roles for all startup roles associated with the user with the given id
-func QueryStartupRoles(id int64, id_type int) ([]StartupRole, error) {
-	resp_ch := make(chan QueryResponse)
-
-	switch id_type {
-	case UserId:
-		{
-			queryQueue <- QueryChan{"/startup_roles", map[string]string{"user_id": strconv.FormatInt(id, 10)}, resp_ch}
-		}
-	case StartupId:
-		{
-			queryQueue <- QueryChan{"/startup_roles", map[string]string{"startup_id": strconv.FormatInt(id, 10)}, resp_ch}
-		}
-	default:
-		return nil, fmt.Errorf("invalid id_type provided")
-	}
-	r := <-resp_ch
-	res := r.result
-	if err := r.err; err != nil {
-		return nil, err
-	}
-
-	roles_array := res["startup_roles"].([]interface{})
-
-	var roles []StartupRole
-	roles_bts, err := json.Marshal(roles_array)
-	if err != nil {
-		log.Print("Woah, error occured while marshalling")
-		panic(err)
-	}
-	if err := json.Unmarshal(roles_bts, &roles); err != nil {
-		return nil, err
-	}
-	return roles, err
 }
