@@ -73,14 +73,20 @@ func QueryUsersFollowingStartups(user_id int64) (startups []Startup, err error) 
 func QueryUsersFollowingUsersIds(user_id int64) (ids []int64, err error) {
 	var tmp IdsResponse
 	endpoint := fmt.Sprintf("/users/%d/following/ids", user_id)
-	err = execQueryThrottled(endpoint, map[string]string{}, &tmp)
+	err = execQueryThrottled(endpoint, map[string]string{"type": "user"}, &tmp)
 	ids = tmp.Ids
 	return
 }
 
 //Query /users/:id/following/ids for a user's followers (return startups only)
 //TODO implement proper pagination
-//TODO
+func QueryUsersFollowingStartupsIds(user_id int64) (ids []int64, err error) {
+	var tmp IdsResponse
+	endpoint := fmt.Sprintf("/users/%d/following/ids", user_id)
+	err = execQueryThrottled(endpoint, map[string]string{"type": "startup"}, &tmp)
+	ids = tmp.Ids
+	return
+}
 
 //Query /startups/:id/followers for a startup's followers
 //TODO implement proper pagination
