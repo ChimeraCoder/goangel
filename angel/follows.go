@@ -5,23 +5,28 @@ package angel
 
 import (
 	"fmt"
-    "strings"
+	"strings"
 )
 
-
+type IdsResponse struct {
+	Total     int64
+	Per_page  int64
+	Page      int64
+	Last_page int64
+	Ids       []int64
+}
 
 //Query /follows/batch for the followers of several users
 //TODO implement proper pagination
 //TODO implement the proper return type here
 func QueryFollowsBatch(ids ...int64) (results interface{}, err error) {
-    id_strings := make([]string, len(ids))
-    for i, id := range ids{
-        id_strings[i] = fmt.Sprintf("%d", id) //do this more elegantly
-    }
-    err = execQueryThrottled("/follows/batch", map[string]string{"ids" : strings.Join(id_strings, ",")}, &results)
+	id_strings := make([]string, len(ids))
+	for i, id := range ids {
+		id_strings[i] = fmt.Sprintf("%d", id) //do this more elegantly
+	}
+	err = execQueryThrottled("/follows/batch", map[string]string{"ids": strings.Join(id_strings, ",")}, &results)
 	return
 }
-
 
 //Query /users/:id/followers for a user's followers
 //TODO implement proper pagination
@@ -34,16 +39,10 @@ func QueryUsersFollowers(user_id int64) (users []AngelUser, err error) {
 //TODO implement proper pagination
 func QueryUsersFollowersIds(user_id int64) (ids []int64, err error) {
 
-    var tmp struct {
-        Total int64
-        Per_page int64
-        Page int64
-        Last_page int64
-        Ids []int64
-    }
+	var tmp IdsResponse
 
 	err = execQueryThrottled(fmt.Sprintf("/users/%d/followers/ids", user_id), map[string]string{}, &tmp)
-    ids = tmp.Ids
+	ids = tmp.Ids
 	return
 }
 
@@ -69,18 +68,19 @@ func QueryUsersFollowingStartups(user_id int64) (startups []Startup, err error) 
 	return
 }
 
-
 //Query /users/:id/following/ids for a user's followers (return users only)
 //TODO implement proper pagination
-//TODO
-
-
-
+func QueryUsersFollowingUsersIds(user_id int64) (ids []int64, err error) {
+	var tmp IdsResponse
+	endpoint := fmt.Sprintf("/users/%d/following/ids", user_id)
+	err = execQueryThrottled(endpoint, map[string]string{}, &tmp)
+	ids = tmp.Ids
+	return
+}
 
 //Query /users/:id/following/ids for a user's followers (return startups only)
 //TODO implement proper pagination
 //TODO
-
 
 //Query /startups/:id/followers for a startup's followers
 //TODO implement proper pagination
@@ -90,9 +90,6 @@ func QueryStartupsFollowers(user_id int64) (users []AngelUser, err error) {
 	return
 }
 
-
 //Query /startups/:id/followers/ids for a startup's followers
 //TODO implement proper pagination
 //TODO
-
-
