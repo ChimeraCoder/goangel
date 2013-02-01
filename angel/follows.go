@@ -98,4 +98,9 @@ func QueryStartupsFollowers(user_id int64) (users []AngelUser, err error) {
 
 //Query /startups/:id/followers/ids for a startup's followers
 //TODO implement proper pagination
-//TODO
+func QueryStartupsFollowersIds(user_id int64) (ids []int64, err error) {
+	var tmp IdsResponse
+	err = execQueryThrottled(fmt.Sprintf("/users/%d/followers/ids", user_id), map[string]string{}, &tmp)
+    ids = tmp.Ids
+	return
+}
