@@ -25,6 +25,7 @@ func (c AngelClient) RequestAccessToken(code string) (access_token string, err e
     v.Set("client_id", c.Client_id)
     v.Set("client_secret", c.Client_secret)
     v.Set("code", code)
+    v.Set("grant_type", "authorization_code")
     response, err := http.PostForm("https://angel.co/api/oauth/token", v)
     if err != nil{
         return

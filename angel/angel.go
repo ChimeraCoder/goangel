@@ -93,3 +93,10 @@ func execQueryThrottled(endpoint string, vals map[string]string, result interfac
 	}
 	return nil
 }
+
+
+func (c AngelClient) execQueryThrottled(endpoint string, vals map[string]string, result interface{}) error {
+    vals["access_token"] = c.Access_token
+    return execQueryThrottled(endpoint, vals, result)
+
+}
