@@ -71,6 +71,7 @@ func GetQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) {
 }
 
 //Issue a POST request to the specified endpoint
+//TODO refactor this
 func PostQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) {
 
 	endpoint_url := API_BASE + endpoint_path
@@ -86,6 +87,12 @@ func PostQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) 
 	if err != nil {
 		return nil, err
 	}
+
+    if resp.StatusCode >= 300 {
+        return nil, fmt.Errorf("received http status code %d", resp.StatusCode)
+    }
+    log.Printf("Received http status code of %d", resp.StatusCode)
+
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
