@@ -16,11 +16,11 @@ const (
 )
 
 const (
-	GET  = iota
-	HEAD = iota
-	POST = iota
-	PUT  = iota
-    DELETE = iota
+	GET    = iota
+	HEAD   = iota
+	POST   = iota
+	PUT    = iota
+	DELETE = iota
 )
 
 //For now, assume we already have the access token somehow 
