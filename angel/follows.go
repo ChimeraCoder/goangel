@@ -30,6 +30,19 @@ func (c AngelClient) QueryPostFollows(id int64, id_type int) (result interface{}
 	return
 }
 
+//DELETE query to /follows to stop following the specified user/startup
+func (c AngelClient) QueryDeleteFollows(id int64, id_type int) (result interface{}, err error) {
+	vals := map[string]string{"id": fmt.Sprintf("%d", id)}
+	switch id_type {
+	case UserId:
+		vals["type"] = "user"
+	case StartupId:
+		vals["type"] = "startup"
+	}
+	err = c.execQueryThrottled("/follows", DELETE, vals, &result)
+	return
+}
+
 //Query /follows/batch for the followers of several users
 //TODO implement proper pagination
 //TODO implement the proper return type here

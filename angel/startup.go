@@ -18,7 +18,7 @@ type Startup struct {
 	Blog_url  *string
 	Video_url *string
 	Hidden    bool
-	Status    struct {
+	Status    *struct {
 		Created_at *string
 		Message    *string
 	}
