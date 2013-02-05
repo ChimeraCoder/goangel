@@ -148,8 +148,14 @@ func execQueryThrottled(endpoint string, method int, vals map[string]string, res
 	return nil
 }
 
-func (c AngelClient) execQueryThrottled(endpoint string, method int, vals map[string]string, result interface{}) error {
+//This requires separate two functions because AngelList will return an error if an incorrect or empty access_token is provided even for unauthenticated queries
+
+func (c AngelClient) execAuthenticatedQueryThrottled(endpoint string, method int, vals map[string]string, result interface{}) error {
 	vals["access_token"] = c.Access_token
 	return execQueryThrottled(endpoint, method, vals, result)
 
+}
+
+func (c AngelClient) execQueryThrottled(endpoint string, method int, vals map[string]string, result interface{}) error {
+	return execQueryThrottled(endpoint, method, vals, result)
 }
