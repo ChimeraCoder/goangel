@@ -7,7 +7,7 @@ import (
 
 //Query /users/:id for a user's information given an id
 func QueryUsers(id int64) (user AngelUser, err error) {
-    err = execQueryThrottled(fmt.Sprintf("/users/%d", id), map[string]string{}, &user)
+    err = execQueryThrottled(fmt.Sprintf("/users/%d", id), GET, map[string]string{}, &user)
     return
 }
 
@@ -17,7 +17,7 @@ func QueryUsersStartups(id int64) ([]StartupRole, error) {
 		Startup_roles []StartupRole
 	}
 	endpoint := fmt.Sprintf("/users/%d/startups", id)
-	if err := execQueryThrottled(endpoint, map[string]string{}, &tmp); err != nil {
+	if err := execQueryThrottled(endpoint, GET, map[string]string{}, &tmp); err != nil {
 		return nil, err
 	}
 
@@ -32,7 +32,7 @@ func QueryUsersBatch(ids ...int64) (results interface{}, err error) {
     for i, id := range ids {
         id_strings[i] = fmt.Sprintf("%d", id) //do this more elegantly
     }
-    err = execQueryThrottled("/users/batch", map[string]string{"ids": strings.Join(id_strings, ",")}, &results)
+    err = execQueryThrottled("/users/batch", GET, map[string]string{"ids": strings.Join(id_strings, ",")}, &results)
     return
 }
 
@@ -40,6 +40,6 @@ func QueryUsersBatch(ids ...int64) (results interface{}, err error) {
 //Query /users/search for a user with the specified slug
 //TODO fix this to search for emails as well
 func QueryUsersSearch(slug string) (user AngelUser, err error) {
-	err = execQueryThrottled("/users/search", map[string]string{"slug": slug}, &user)
+	err = execQueryThrottled("/users/search", GET, map[string]string{"slug": slug}, &user)
 	return
 }
