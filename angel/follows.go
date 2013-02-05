@@ -18,18 +18,17 @@ type IdsResponse struct {
 
 //POST query to /follows to follow the specified user/startup
 //Will throw an error (400) if the client's user is already following the specified user/startup
-func (c AngelClient) QueryPostFollows(id int64, id_type int) (result interface{}, err error){
-    vals := map[string]string{"id" : fmt.Sprintf("%d", id)}
-    switch id_type {
-    case UserId:
-        vals["type"] = "user"
-    case StartupId:
-        vals["type"] = "startup"
-    }
-    err = c.execQueryThrottled("/follows", POST, vals, &result)
-    return
+func (c AngelClient) QueryPostFollows(id int64, id_type int) (result interface{}, err error) {
+	vals := map[string]string{"id": fmt.Sprintf("%d", id)}
+	switch id_type {
+	case UserId:
+		vals["type"] = "user"
+	case StartupId:
+		vals["type"] = "startup"
+	}
+	err = c.execQueryThrottled("/follows", POST, vals, &result)
+	return
 }
-
 
 //Query /follows/batch for the followers of several users
 //TODO implement proper pagination
@@ -46,7 +45,7 @@ func QueryFollowsBatch(ids ...int64) (results interface{}, err error) {
 //Query /users/:id/followers for a user's followers
 //TODO implement proper pagination
 func QueryUsersFollowers(user_id int64) (users []AngelUser, err error) {
-	err = execQueryThrottled(fmt.Sprintf("/startups/%d/followers", user_id),  GET, map[string]string{}, users)
+	err = execQueryThrottled(fmt.Sprintf("/startups/%d/followers", user_id), GET, map[string]string{}, users)
 	return
 }
 
@@ -116,6 +115,6 @@ func QueryStartupsFollowers(user_id int64) (users []AngelUser, err error) {
 func QueryStartupsFollowersIds(user_id int64) (ids []int64, err error) {
 	var tmp IdsResponse
 	err = execQueryThrottled(fmt.Sprintf("/users/%d/followers/ids", user_id), GET, map[string]string{}, &tmp)
-    ids = tmp.Ids
+	ids = tmp.Ids
 	return
 }

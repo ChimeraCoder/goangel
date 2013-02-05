@@ -1,8 +1,8 @@
 package angel
 
 import (
-    "fmt"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,10 +16,10 @@ const (
 )
 
 const (
-    GET = iota
-    HEAD = iota
-    POST = iota
-    PUT = iota
+	GET  = iota
+	HEAD = iota
+	POST = iota
+	PUT  = iota
 )
 
 //For now, assume we already have the access token somehow 
@@ -32,7 +32,7 @@ var queryQueue = make(chan QueryChan, 10)
 
 type QueryChan struct {
 	endpoint_path string
-    method int
+	method        int
 	keyVals       map[string]string
 	response_ch   chan QueryResponse
 }
@@ -88,10 +88,10 @@ func PostQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) 
 		return nil, err
 	}
 
-    if resp.StatusCode >= 300 {
-        return nil, fmt.Errorf("received http status code %d", resp.StatusCode)
-    }
-    log.Printf("Received http status code of %d", resp.StatusCode)
+	if resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("received http status code %d", resp.StatusCode)
+	}
+	log.Printf("Received http status code of %d", resp.StatusCode)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -102,15 +102,15 @@ func PostQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) 
 }
 
 func Query(endpoint_path string, method int, keyVals map[string]string) (bts []byte, err error) {
-    switch method{
-    case GET:
-        bts, err = GetQuery(endpoint_path, keyVals)
-    case POST:
-        bts, err = PostQuery(endpoint_path, keyVals)
-    default:
-        err = fmt.Errorf("method not supported or not yet implemented")
-    }
-    return
+	switch method {
+	case GET:
+		bts, err = GetQuery(endpoint_path, keyVals)
+	case POST:
+		bts, err = PostQuery(endpoint_path, keyVals)
+	default:
+		err = fmt.Errorf("method not supported or not yet implemented")
+	}
+	return
 }
 
 //Execute a query that will automatically be throttled
@@ -118,7 +118,7 @@ func throttledQuery(queryQueue chan QueryChan) {
 	for q := range queryQueue {
 
 		endpoint_path := q.endpoint_path
-        method := q.method
+		method := q.method
 		keyVals := q.keyVals
 		response_ch := q.response_ch
 		result, err := Query(endpoint_path, method, keyVals)
@@ -147,9 +147,8 @@ func execQueryThrottled(endpoint string, method int, vals map[string]string, res
 	return nil
 }
 
-
 func (c AngelClient) execQueryThrottled(endpoint string, method int, vals map[string]string, result interface{}) error {
-    vals["access_token"] = c.Access_token
-    return execQueryThrottled(endpoint, method, vals, result)
+	vals["access_token"] = c.Access_token
+	return execQueryThrottled(endpoint, method, vals, result)
 
 }

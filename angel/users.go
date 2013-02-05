@@ -2,13 +2,13 @@ package angel
 
 import (
 	"fmt"
-    "strings"
+	"strings"
 )
 
 //Query /users/:id for a user's information given an id
 func QueryUsers(id int64) (user AngelUser, err error) {
-    err = execQueryThrottled(fmt.Sprintf("/users/%d", id), GET, map[string]string{}, &user)
-    return
+	err = execQueryThrottled(fmt.Sprintf("/users/%d", id), GET, map[string]string{}, &user)
+	return
 }
 
 //Query /users/:id/startups for a user's startup roles
@@ -28,14 +28,13 @@ func QueryUsersStartups(id int64) ([]StartupRole, error) {
 //TODO implement proper pagination
 //TODO implement the proper return type here
 func QueryUsersBatch(ids ...int64) (results interface{}, err error) {
-    id_strings := make([]string, len(ids))
-    for i, id := range ids {
-        id_strings[i] = fmt.Sprintf("%d", id) //do this more elegantly
-    }
-    err = execQueryThrottled("/users/batch", GET, map[string]string{"ids": strings.Join(id_strings, ",")}, &results)
-    return
+	id_strings := make([]string, len(ids))
+	for i, id := range ids {
+		id_strings[i] = fmt.Sprintf("%d", id) //do this more elegantly
+	}
+	err = execQueryThrottled("/users/batch", GET, map[string]string{"ids": strings.Join(id_strings, ",")}, &results)
+	return
 }
-
 
 //Query /users/search for a user with the specified slug
 //TODO fix this to search for emails as well
