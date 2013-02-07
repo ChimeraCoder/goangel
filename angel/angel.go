@@ -1,3 +1,4 @@
+//Package angel provides functions for interacting with the AngelList API
 package angel
 
 import (
@@ -23,10 +24,9 @@ const (
 	DELETE = iota
 )
 
-//For now, assume we already have the access token somehow 
 const API_BASE = "https://api.angel.co/1"
 
-const SECONDS_PER_QUERY = 10 //By default, execute at most one query every ten seconds
+var SECONDS_PER_QUERY = 10 //By default, execute at most one query every ten seconds
 //Set to 0 to turn off throttling
 
 var queryQueue = make(chan QueryChan, 10)

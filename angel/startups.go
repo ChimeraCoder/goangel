@@ -11,19 +11,19 @@ const (
 	POPULARITY = iota
 )
 
-//Query /startups/:id for a startup, given its id
+//QueryStartupsId queries /startups/:id for a startup, given its id
 func (c AngelClient) QueryStartupsId(startup_id int64) (startup Startup, err error) {
 	err = c.execQueryThrottled(fmt.Sprintf("/startups/%d/", startup_id), GET, map[string]string{}, &startup)
 	return
 }
 
-//Query /startups/:id/comments for a startup's comments, given its id
+//QueryStartupsIdComments queries /startups/:id/comments for a startup's comments, given its id
 func (c AngelClient) QueryStartupsIdComments(startup_id int64) (comments []Comment, err error) {
 	err = c.execQueryThrottled(fmt.Sprintf("/startups/%d/comments", startup_id), GET, map[string]string{}, &comments)
 	return
 }
 
-//Query /startups/:id/users for a startup's tagged users, given its id
+//QueryStartupsIdUsers queries  /startups/:id/users for a startup's tagged users, given its id
 func (c AngelClient) QueryStartupsIdUsers(startup_id int64) (users []AngelUser, err error) {
 	var result struct {
 		Startup_roles []AngelUser
