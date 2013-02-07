@@ -1,6 +1,6 @@
 package angel
 
-type UsersBatchResponse struct {
+type usersBatchResponse struct {
 	Page      int64
 	Users     []AngelUser
 	Per_page  int64

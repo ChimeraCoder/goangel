@@ -1,6 +1,6 @@
 package angel
 
-type StartupsBatchResponse struct {
+type startupsBatchResponse struct {
 	Startups  []Startup
 	Page      float64
 	Per_page  float64

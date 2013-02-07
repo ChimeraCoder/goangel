@@ -1,6 +1,7 @@
 /* Implement the endpoints documented at 
 https://angel.co/api/spec/follows
 */
+
 package angel
 
 import (
@@ -79,7 +80,7 @@ func (c AngelClient) QueryUsersFollowersIds(user_id int64) (ids []int64, err err
 func (c AngelClient) QueryUsersFollowingUsers(user_id int64) (users []AngelUser, err error) {
 	//TODO implement proper pagination
 
-	var batch_response UsersBatchResponse
+	var batch_response usersBatchResponse
 	endpoint := fmt.Sprintf("/users/%d/following", user_id)
 	err = c.execQueryThrottled(endpoint, GET, map[string]string{}, &batch_response)
 	users = batch_response.Users
@@ -89,7 +90,7 @@ func (c AngelClient) QueryUsersFollowingUsers(user_id int64) (users []AngelUser,
 //QueryUsersFollowingStartups queries  /users/:id/following for a user's followers (return startups only)
 func (c AngelClient) QueryUsersFollowingStartups(user_id int64) (startups []Startup, err error) {
 	//TODO implement proper pagination
-	var batch_response StartupsBatchResponse
+	var batch_response startupsBatchResponse
 	endpoint := fmt.Sprintf("/users/%d/following", user_id)
 	err = c.execQueryThrottled(endpoint, GET, map[string]string{"type": "startup"}, &batch_response)
 	startups = batch_response.Startups

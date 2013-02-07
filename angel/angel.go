@@ -29,18 +29,18 @@ const API_BASE = "https://api.angel.co/1"
 //SECONDS_PER_QUERY sets the number of seconds that must elapse between queries
 //By default, execute at most one query every ten seconds
 //Set to 0 to turn off throttling
-var SECONDS_PER_QUERY = 10
+var SECONDS_PER_QUERY = time.Duration(10 * time.Second)
 
-var queryQueue = make(chan QueryChan, 10)
+var queryQueue = make(chan queryChan, 10)
 
-type QueryChan struct {
+type queryChan struct {
 	endpoint_path string
 	method        int
 	keyVals       map[string]string
-	response_ch   chan QueryResponse
+	response_ch   chan queryResponse
 }
 
-type QueryResponse struct {
+type queryResponse struct {
 	result []byte
 	err    error
 }
@@ -118,7 +118,7 @@ func Query(endpoint_path string, method int, keyVals map[string]string) (bts []b
 }
 
 //Execute a query that will automatically be throttled
-func throttledQuery(queryQueue chan QueryChan) {
+func throttledQuery(queryQueue chan queryChan) {
 	for q := range queryQueue {
 
 		endpoint_path := q.endpoint_path
@@ -136,8 +136,8 @@ func throttledQuery(queryQueue chan QueryChan) {
 }
 
 func execQueryThrottled(endpoint string, method int, vals map[string]string, result interface{}) error {
-	resp_ch := make(chan QueryResponse)
-	queryQueue <- QueryChan{endpoint, method, vals, resp_ch}
+	resp_ch := make(chan queryResponse)
+	queryQueue <- queryChan{endpoint, method, vals, resp_ch}
 	r := <-resp_ch
 	res := r.result
 	if err := r.err; err != nil {
