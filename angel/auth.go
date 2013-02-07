@@ -14,11 +14,12 @@ type AngelClient struct {
 	Access_token  string
 }
 
-//Generate a URI which users should be redirected to in order to authorize the application
+//AuthorizeUri generates a URI which users should be redirected to in order to authorize the application
 func (c AngelClient) AuthorizeUri() string {
 	return fmt.Sprintf("https://angel.co/api/oauth/authorize?client_id=%s&response_type=code", c.Client_id)
 }
 
+//RequestAccessToken exchanges the code from an OAuth callback for an access token
 func (c AngelClient) RequestAccessToken(code string) (access_token string, err error) {
 	v := url.Values{}
 	v.Set("client_id", c.Client_id)

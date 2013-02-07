@@ -26,8 +26,10 @@ const (
 
 const API_BASE = "https://api.angel.co/1"
 
-var SECONDS_PER_QUERY = 10 //By default, execute at most one query every ten seconds
+//SECONDS_PER_QUERY sets the number of seconds that must elapse between queries
+//By default, execute at most one query every ten seconds
 //Set to 0 to turn off throttling
+var SECONDS_PER_QUERY = 10
 
 var queryQueue = make(chan QueryChan, 10)
 
@@ -47,7 +49,7 @@ func init() {
 	go throttledQuery(queryQueue)
 }
 
-//Issue a GET request to the specified endpoint
+//GetQuery issues a GET request to the specified endpoint
 func GetQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) {
 
 	endpoint_url := API_BASE + endpoint_path
@@ -71,10 +73,9 @@ func GetQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) {
 	return body, err
 }
 
-//Issue a POST request to the specified endpoint
-//TODO refactor this
+//PostQuery issues a POST request to the specified endpoint
 func PostQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) {
-
+	//TODO refactor this
 	endpoint_url := API_BASE + endpoint_path
 
 	v := url.Values{}
@@ -102,6 +103,8 @@ func PostQuery(endpoint_path string, keyVals map[string]string) ([]byte, error) 
 	return body, err
 }
 
+//Query issues a query to the AngelList API
+//Like GetQuery and PostQuery, this function exists for the convenience of the automatically-throttled queries
 func Query(endpoint_path string, method int, keyVals map[string]string) (bts []byte, err error) {
 	switch method {
 	case GET:

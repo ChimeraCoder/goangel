@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-//Query /startup_roles for all startup roles associated with the user with the given id
+//QueryStartupRoles queries /startup_roles for all startup roles associated with the user with the given id
 func (c AngelClient) QueryStartupRoles(id int64, id_type int) (startuproles []StartupRole, err error) {
 	var tmp struct {
 		Startup_roles []StartupRole
