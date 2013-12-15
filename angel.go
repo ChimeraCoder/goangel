@@ -131,7 +131,7 @@ func throttledQuery(queryQueue chan queryChan) {
 			err    error
 		}{result, err}
 
-		time.Sleep(SECONDS_PER_QUERY)
+		<-time.After(SECONDS_PER_QUERY)
 	}
 }
 
