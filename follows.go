@@ -1,4 +1,4 @@
-/* Implement the endpoints documented at 
+/* Implement the endpoints documented at
 https://angel.co/api/spec/follows
 */
 
